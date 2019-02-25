@@ -287,7 +287,7 @@ def dog_or_404(dog_id):
 
 - We have to update our class to specify what fields we want to allow on our requests to the server
 
-```
+```python
 class Dog(Resource):
     def __init__(self):
         self.reqparse = reqparse.RequestParser()
@@ -328,7 +328,7 @@ class Dog(Resource):
 
 **Go ahead and give delete a try**
 
-```
+```python
 def delete(self, id):
     query = models.Dog.delete().where(models.Dog.id==id)
     query.execute()
