@@ -536,10 +536,29 @@ def get(self):
 Cool and we've set up our api to work with react!
 
 
+### Setting up Postgres
 
+```
+$ psql
+> CREATE DATABASE database_name;
+> CREATE USER jimuser WITH PASSWORD 'password';
+GRANT ALL PRIVILEGES ON DATABASE dog TO jimuser;
+> \q
+```
 
+- We have to create our db on our computer.  
 
+- Then we just update our database.
 
+models.py
+```python
+DATABASE = PostgresqlDatabase(
+    'dog',  # Required by Peewee.
+    user='jim',  # Will be passed directly to psycopg2.
+    password='secret'
+    )  
+
+```
 
 
 
