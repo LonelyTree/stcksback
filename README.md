@@ -1,5 +1,7 @@
 # flask-api
 
+We are going to create a basic api that performs all crud routes, as well as have using registration and session setup
+
 
 #### Dependencies
 
@@ -12,6 +14,8 @@
 virtualenv .env -p python3
 source .env/bin/activate
 ```
+
+
 
 ### Setup basic server 
 
@@ -36,7 +40,7 @@ if __name__ == '__main__':
 ### models.py
 
 
-```
+```python
 import datetime
 
 from peewee import *
