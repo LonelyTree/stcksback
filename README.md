@@ -538,7 +538,7 @@ Cool and we've set up our api to work with react!
 
 ### Setting up Postgres
 
-```
+```sql
 $ psql
 > CREATE DATABASE database_name;
 > CREATE USER jimuser WITH PASSWORD 'password';
