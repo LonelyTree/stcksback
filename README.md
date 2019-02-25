@@ -569,7 +569,7 @@ models.py
 DATABASE = PostgresqlDatabase(
     'dog',  # Required by Peewee.
     user='jim',  # Will be passed directly to psycopg2.
-    password='secret'
+    password='password'
     )  
 
 ```
