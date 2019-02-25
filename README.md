@@ -342,17 +342,18 @@ def delete(self, id):
 - Lets add a user model 
 
 
-```
+```python
 import datetime
 
 from peewee import *
 from flask_bcrypt import generate_password_hash
+from flask_login import UserMixin
 
 import config
 
 DATABASE = SqliteDatabase('dogs.sqlite')
 
-class User(Model):
+class User(UserMixin, Model):
     username = CharField(unique=True)
     email = CharField(unique=True)
     password = CharField()
@@ -398,7 +399,7 @@ def initialize():
 
 - Notice we can also create a `config` file to hold our configuration options.  
 
-```
+```python
 DEBUG = True
 PORT = 8000
 SECRET_KEY = 'jasdlfj.adsfjlajdsf.adsjflkadsf'
@@ -406,17 +407,33 @@ SECRET_KEY = 'jasdlfj.adsfjlajdsf.adsjflkadsf'
 
 - then just update the `app.py`
 
-```
+```python
 from flask import Flask
 
 import models
 from resources.users import users_api
 from resources.dogs import dogs_api
+from flask_cors import CORS
+from flask_login import LoginManager
+login_manager = LoginManager()
+## sets up our login for the app
 
 
 import config
 
 app = Flask(__name__)
+app.secret_key = config.SECRET_KEY
+login_manager.init_app(app)
+
+@login_manager.user_loader
+def load_user(userid):
+    try:
+        return models.User.get(models.User.id == userid)
+    except models.DoesNotExist:
+        return None
+
+CORS(dogs_api, origins=["http://localhost:3000"], supports_credentials=True)
+CORS(users_api, origins= ["http://localhost:3000"], supports_credentials=True)
 app.register_blueprint(dogs_api, url_prefix='/api/v1')
 app.register_blueprint(users_api, url_prefix='/api/v1')
 
@@ -430,9 +447,11 @@ if __name__ == '__main__':
     
 ```
 
+- We also set up the login manager and setup cors to allow our react app to connect to our API's.  Notice we passed `supports_credentials=True` as well in order to give us the ability to send cookies back and forth.  
+
 - So we defined the `users_api` lets go ahead and write the routes out. 
 
-```
+```python
 import json
 
 from flask import jsonify, Blueprint, abort, make_response
@@ -441,6 +460,7 @@ from flask_restful import (Resource, Api, reqparse,
                                inputs, fields, marshal,
                                marshal_with, url_for)
 
+from flask_login import login_user, logout_user, login_required, current_user
 import models
 
 user_fields = {
@@ -482,6 +502,7 @@ class UserList(Resource):
         if args['password'] == args['verify_password']:
             print(args, ' this is args')
             user = models.User.create_user(**args)
+            login_user(user)
             return marshal(user, user_fields), 201
         return make_response(
             json.dumps({
@@ -500,11 +521,19 @@ api.add_resource(
 ```
 
 
+- Now we can just add `@login_required` wherever we want as a decorator
 
+```python
+@login_required
+def get(self):
 
+    dogs = [marshal(dog, dog_fields)
+               for dog in models.Dog.select()]
+    return {'dogs': dogs}
 
+```
 
-
+Cool and we've set up our api to work with react!
 
 
 
