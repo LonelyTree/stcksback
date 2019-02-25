@@ -3,8 +3,15 @@
 
 #### Dependencies
 
-```pip install flask-restful peewee```
+```pip install flask-restful peewee flask psycopg2 flask_login flask_cors```
 
+#### Setup virtualenv
+
+- inside flask-api folder
+```bash
+virtualenv .env -p python3
+source .env/bin/activate
+```
 
 ### Setup basic server 
 
