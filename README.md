@@ -8,7 +8,7 @@
 
 ### Setup basic server 
 
-```
+```python
 from flask import Flask
 
 DEBUG = True
@@ -59,7 +59,7 @@ def initialize():
 
 ### resources 
 
-```
+```python
 from flask import jsonify, Blueprint
 
 from flask_restful import Resource, Api
@@ -110,7 +110,7 @@ api.add_resource(
 
 **Now we need to Register the Blueprint in the app**
 
-```
+```python
 from flask import Flask
 
 import models
@@ -139,14 +139,15 @@ app.register_blueprint(dogs_api, url_prefix='/api/v1')
 
 - Lets refactor our classes like the following 
 
-```
-from flask import jsonify, Blueprint
+```python
+from flask import jsonify, Blueprint, abort
 
-from flask_restful import Resource, Api, reqparse, fields
+from flask_restful import (Resource, Api, reqparse, fields, marshal,
+                               marshal_with, url_for)
 
 import models
 
-## define fields on requests
+## define fields on responses
 dog_fields = {
     'id': fields.Integer,
     'name': fields.String,
@@ -169,7 +170,14 @@ class DogList(Resource):
             help='No course dog breed provided',
             location=['form', 'json']
         )
+        self.reqparse.add_argument(
+            'owner',
+            required=False,
+            help='No  owner provided',
+            location=['form', 'json']
+        )
         super().__init__()
+        
     def get(self):
         return jsonify({'dogs': [{'name': 'Franklin'}]})
 
@@ -204,9 +212,9 @@ api.add_resource(
 )
 ```
 
-- In the `__init__` function we are initializing the reqparse that will allow us to read the body of requests. We can also set requirements for the request with the `.add_argument` function with the first argument being one of the properties defined in the `dog_fields` dictionary at the top.  Then we can set requirements and messages back to the client if they're not meant.  
+- In the `__init__` function we are initializing the reqparse that will allow us to read the body of requests. We can also set requirements for the request with the `.add_argument` function with the first argument the property.  Then we can set requirements and messages back to the client if they're not meant.  
 
- ```
+ ```python
 def post(self):
         args = self.reqparse.parse_args()
         print(args, 'hittingggg ')
@@ -214,11 +222,65 @@ def post(self):
         return jsonify({'dogs': [{'name': 'Franklin'}]})
   ``` 
 - We can access the args by calling `.parse_args` on every request, think about `body_parser` in express.  Then we are spreading out all the arguments to the properties we want to pass to the create.  An example would look like the following, 
-
-```
+ The location tells us where we will accept requests from in this case `x-form-www-urlencoded` and `json`, (so basically forms and ajax requests)
+ 
+```python
 >>> mydict = {'x':1,'y':2,'z':3}
 >>> foo(**mydict)
 x=1
 y=2
 z=3
 ```
+
+
+**Test with Postman** - Select raw and create a json object and make sure to choose "JSON" as the datatype before you hit send (the drop down is where it says text)
+
+**Formatting responses**
+
+- So our db responses we won't be able to serialize them into json, so we have to use this thing called [marshal](marshal(data, fields, envelope=None)¶
+Takes raw data (https://flask-restful.readthedocs.io/en/latest/api.html)
+
+- marshal -Takes raw data (in the form of a dict, list, object) and a dict of fields to output and filters the data based on the fields we defined in the `dog_fields` dictionary
+
+- This will be done to each field from our response from our database like the following
+
+```
+def get(self):
+        dogs = [marshal(dog, dog_fields)
+                   for dog in models.Dog.select()]
+        return {'dogs': dogs}
+
+```
+
+- We can also use the `marshal_with` like the following, which is just a decorator the does what we just did but for us. 
+
+```
+@marshal_with(dog_fields)
+def get(self, id):
+    return dog_or_404(id)
+
+```
+
+- **Go ahead and use it with the Post**
+
+```
+@marshal_with(dog_fields)
+    def post(self):
+        args = self.reqparse.parse_args()
+        dog = models.Dog.create(**args)
+        return dog
+```
+
+- and we can define a function to either send the 404 using `abort` or return the dog, and the result of that is turned in json using the `@marshal_with` decorator.  
+
+```
+def dog_or_404(dog_id):
+    try:
+        dog = models.Dog.get(models.Dog.id==dog_id)
+    except models.Dog.DoesNotExist:
+        abort(404)
+    else:
+        return dog
+```
+
+
