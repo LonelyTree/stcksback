@@ -337,3 +337,182 @@ def delete(self, id):
 
 - There we go, we got a full api working!
 
+### Adding Users
+
+- Lets add a user model 
+
+
+```
+import datetime
+
+from peewee import *
+from flask_bcrypt import generate_password_hash
+
+import config
+
+DATABASE = SqliteDatabase('dogs.sqlite')
+
+class User(Model):
+    username = CharField(unique=True)
+    email = CharField(unique=True)
+    password = CharField()
+
+    class Meta:
+        database = DATABASE
+
+    @classmethod
+    def create_user(cls, username, email, password, **kwargs):
+        email = email.lower()
+        try:
+            cls.select().where(
+                (cls.email==email)
+            ).get()
+        except cls.DoesNotExist:
+            user = cls(username=username, email=email)
+            user.password = generate_password_hash(password)
+
+            user.save()
+            return user
+        else:
+            raise Exception("User with that email already exists")
+
+class Dog(Model):
+    name = CharField()
+    owner = CharField()
+    breed = CharField()
+    created_by = ForeignKeyField(User, related_name='dog_set')
+    created_at = DateTimeField(default=datetime.datetime.now)
+
+    class Meta:
+        database = DATABASE
+
+
+def initialize():
+    DATABASE.connect()
+    DATABASE.create_tables([User, Dog], safe=True)
+    DATABASE.close()
+
+```
+
+- This is very similar to what we did on Friday, and we added a relation with the Dog model.  
+
+- Notice we can also create a `config` file to hold our configuration options.  
+
+```
+DEBUG = True
+PORT = 8000
+SECRET_KEY = 'jasdlfj.adsfjlajdsf.adsjflkadsf'
+```
+
+- then just update the `app.py`
+
+```
+from flask import Flask
+
+import models
+from resources.users import users_api
+from resources.dogs import dogs_api
+
+
+import config
+
+app = Flask(__name__)
+app.register_blueprint(dogs_api, url_prefix='/api/v1')
+app.register_blueprint(users_api, url_prefix='/api/v1')
+
+@app.route('/')
+def hello_world():
+    return 'Hello World'
+
+if __name__ == '__main__':
+    models.initialize()
+    app.run(debug=config.DEBUG, port=config.PORT)
+    
+```
+
+- So we defined the `users_api` lets go ahead and write the routes out. 
+
+```
+import json
+
+from flask import jsonify, Blueprint, abort, make_response
+
+from flask_restful import (Resource, Api, reqparse,
+                               inputs, fields, marshal,
+                               marshal_with, url_for)
+
+import models
+
+user_fields = {
+    'username': fields.String,
+}
+
+
+class UserList(Resource):
+    def __init__(self):
+        self.reqparse = reqparse.RequestParser()
+        self.reqparse.add_argument(
+            'username',
+            required=True,
+            help='No username provided',
+            location=['form', 'json']
+        )
+        self.reqparse.add_argument(
+            'email',
+            required=True,
+            help='No email provided',
+            location=['form', 'json']
+        )
+        self.reqparse.add_argument(
+            'password',
+            required=True,
+            help='No password provided',
+            location=['form', 'json']
+        )
+        self.reqparse.add_argument(
+            'verify_password',
+            required=True,
+            help='No password verification provided',
+            location=['form', 'json']
+        )
+        super().__init__()
+
+    def post(self):
+        args = self.reqparse.parse_args()
+        if args['password'] == args['verify_password']:
+            print(args, ' this is args')
+            user = models.User.create_user(**args)
+            return marshal(user, user_fields), 201
+        return make_response(
+            json.dumps({
+                'error': 'Password and password verification do not match'
+            }), 400)
+
+
+
+users_api = Blueprint('resources.users', __name__)
+api = Api(users_api)
+api.add_resource(
+    UserList,
+    '/users',
+    endpoint='users'
+)
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
