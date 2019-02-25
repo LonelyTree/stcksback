@@ -244,7 +244,7 @@ Takes raw data (https://flask-restful.readthedocs.io/en/latest/api.html)
 
 - This will be done to each field from our response from our database like the following
 
-```
+```python
 def get(self):
         dogs = [marshal(dog, dog_fields)
                    for dog in models.Dog.select()]
@@ -254,7 +254,7 @@ def get(self):
 
 - We can also use the `marshal_with` like the following, which is just a decorator the does what we just did but for us. 
 
-```
+```python
 @marshal_with(dog_fields)
 def get(self, id):
     return dog_or_404(id)
@@ -263,7 +263,7 @@ def get(self, id):
 
 - **Go ahead and use it with the Post**
 
-```
+```python
 @marshal_with(dog_fields)
     def post(self):
         args = self.reqparse.parse_args()
@@ -273,7 +273,7 @@ def get(self, id):
 
 - and we can define a function to either send the 404 using `abort` or return the dog, and the result of that is turned in json using the `@marshal_with` decorator.  
 
-```
+```python
 def dog_or_404(dog_id):
     try:
         dog = models.Dog.get(models.Dog.id==dog_id)
@@ -283,4 +283,57 @@ def dog_or_404(dog_id):
         return dog
 ```
 
+### Put and Delete Route
+
+- We have to update our class to specify what fields we want to allow on our requests to the server
+
+```
+class Dog(Resource):
+    def __init__(self):
+        self.reqparse = reqparse.RequestParser()
+        self.reqparse.add_argument(
+            'name',
+            required=False,
+            help='No dog name provided',
+            location=['form', 'json']
+        )
+        self.reqparse.add_argument(
+            'breed',
+            required=False,
+            help='No course dog breed provided',
+            location=['form', 'json']
+        )
+        self.reqparse.add_argument(
+            'owner',
+            required=False,
+            help='No  owner provided',
+            location=['form', 'json']
+        )
+        super().__init__()
+
+    @marshal_with(dog_fields)
+    def get(self, id):
+        return dog_or_404(id)
+
+    @marshal_with(dog_fields)
+    def put(self, id):
+        args = self.reqparse.parse_args()
+        query = models.Dog.update(**args).where(models.Dog.id==id)
+        query.execute()
+        return (models.Dog.get(models.Dog.id==id), 200)
+
+```
+
+- Here we see the put route for the model we need to define the query then execute it to perform the update, (usually it does it automatically.  Then we are just fetching the Dog and returning a tuple with a status code if we want.  You don't have to return a tuple (like we did before), but we are showing you we can and you can include the status code.  
+
+**Go ahead and give delete a try**
+
+```
+def delete(self, id):
+    query = models.Dog.delete().where(models.Dog.id==id)
+    query.execute()
+    return 'resource deleted'
+```
+
+- There we go, we got a full api working!
 
