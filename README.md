@@ -15,6 +15,12 @@ virtualenv .env -p python3
 source .env/bin/activate
 ```
 
+#### Dependencies
+
+```
+pip3 install flask-restful peewee flask psycopg2 flask_login flask_cors
+pip3 freeze > requirements.txt
+```
 
 
 ### Setup basic server 
