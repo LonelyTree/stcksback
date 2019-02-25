@@ -3,13 +3,10 @@
 We are going to create a basic api that performs all crud routes, as well as have using registration and session setup
 
 
-#### Dependencies
-
-```pip install flask-restful peewee flask psycopg2 flask_login flask_cors```
 
 #### Setup virtualenv
 
-- inside flask-api folder
+- inside flask-api-dogs folder
 ```bash
 virtualenv .env -p python3
 source .env/bin/activate
