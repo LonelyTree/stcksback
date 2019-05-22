@@ -31,10 +31,9 @@ PORT = 8000
 app = Flask(__name__)
 
 
-
 @app.route('/')
-def hello_world():
-    return 'Hello World'
+def index():
+    return 'hi'
 
 if __name__ == '__main__':
     app.run(debug=DEBUG, port=PORT)
@@ -70,8 +69,76 @@ def initialize():
 
 ```
 
+- We are using sqlite as our database here, this is really great for development purposes to get up and running real quick, later on we will connect to our production database postgres.
+
+- Meta - When Python creates a class object, special construction instructions can be provided. This is done through the Meta class. In this case, the Model base class includes methods for creating and saving instances of this class to a database. This requires knowing which database to use. Since the database isn't part of the class itself, this class constructor information is provided through the special Meta class.
+
+- The initialize method will set up our datatables, while we open and close the connection
+
+### Update the app.py
+
+```python
+from flask import Flask, g
+
+import models
+
+DEBUG = True
+PORT = 8000
+
+app = Flask(__name__)
+
+
+@app.before_request
+def before_request():
+    """Connect to the database before each request."""
+    g.db = models.DATABASE
+    g.db.connect()
+
+
+@app.after_request
+def after_request(response):
+    """Close the database connection after each request."""
+    g.db.close()
+    return response
+
+@app.route('/')
+def index():
+    return 'hi'
+
+
+if __name__ == '__main__':
+    models.initialize()
+    app.run(debug=DEBUG, port=PORT)
+```
+
+- the `g` stands for global and we are setting up a global access to our database throughout the app. 
+
+- when developing a web application, it’s common to open a connection when a request starts, and close it when the response is returned. You should always manage your connections explicitly. For instance, if you are using a connection pool, connections will only be recycled correctly if you call connect() and close().
+
+We will tell flask that during the request/response cycle we need to create a connection to the database. Flask provides some useful decorators to make this easy
+
+```python
+@app.before_request
+def before_request():
+    """Connect to the database before each request."""
+    g.db = models.DATABASE
+    g.db.connect()
+
+
+@app.after_request
+def after_request(response):
+    """Close the database connection after each request."""
+    g.db.close()
+    return response
+ ```
 
 ### resources 
+
+```bash
+mkdir resources
+touch resources/init.py
+touch resources/dogs.py
+```
 
 ```python
 from flask import jsonify, Blueprint
