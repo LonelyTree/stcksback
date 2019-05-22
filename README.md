@@ -314,7 +314,15 @@ z=3
 ```
 
 
-**Test with Postman** - Select raw and create a json object and make sure to choose "JSON" as the datatype before you hit send (the drop down is where it says text)
+**Test with Postman** - Select raw and create a json object and make sure to choose "JSON" as the datatype before you hit send (the drop down is where it says text), here's an object you can use
+
+```json
+{
+	"name": "Frankie",
+	"breed": "newfie",
+	"owner": "Jim"
+}
+```
 
 **Formatting responses**
 
@@ -527,6 +535,14 @@ if __name__ == '__main__':
     app.run(debug=config.DEBUG, port=config.PORT)
     
 ```
+
+
+- `config.secretkey` is for the hash for our session cookie we can make up whatever random characters we'd like. By default, Flask-Login uses sessions for authentication. This means you must set the secret key on your application,
+
+-  We can use the `LoginManager()` to handle all the login things like is_authenticated, or get id. The login manager contains the code that lets your application and Flask-Login work together, such as how to load a user from an ID, and where to send users when they need to log in.  
+
+-  `@login_manager.user_loader` - We need to provide user_loader callback. This callback is used to reload the user object from the user ID stored in the session. It should take the unicode ID of a user, and return the corresponding user object.
+
 
 - We also set up the login manager and setup cors to allow our react app to connect to our API's.  Notice we passed `supports_credentials=True` as well in order to give us the ability to send cookies back and forth.  
 
