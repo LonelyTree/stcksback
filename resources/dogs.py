@@ -1,7 +1,7 @@
 
 
 
-from flask import jsonify, Blueprint
+from flask import jsonify, Blueprint, abort
 from flask_restful import (Resource, Api, reqparse, fields, marshal,
                                marshal_with, url_for)
 
@@ -11,6 +11,8 @@ import models
 ## define what fields we want on our responses
 
 ## Marshal Fields
+# dog_fields have to do with what we want the response object
+# to the client to look like
 dog_fields = {
     'id': fields.Integer,
     'name': fields.String,
@@ -48,6 +50,10 @@ class DogList(Resource):
         super().__init__()
 
     def get(self):
+        # models.Dog.select() ## Look up peewee queries
+
+        # for Generating response object
+        # marshal in flask
         return jsonify({'dogs': [{'name': 'Franklin'}]})
 
     @marshal_with(dog_fields)
@@ -111,8 +117,9 @@ class Dog(Resource):
         return (models.Dog.get(models.Dog.id==id), 200)
 
     def delete(self, id):
-
-        return jsonify({'name': 'Franklin'})
+        query = models.Dog.delete().where(models.Dog.id == id)
+        query.execute()
+        return {"message": "resource deleted"}
 
 
 # were setting a module of view functions that can be attached to our flask app
