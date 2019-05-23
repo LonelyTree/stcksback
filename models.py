@@ -12,7 +12,7 @@ DATABASE = SqliteDatabase('dogs.sqlite')
 
 class Dog(Model):
     name = CharField()
-    Owner = CharField()
+    owner = CharField()
     breed = CharField()
     created_at = DateTimeField(default=datetime.datetime.now)
 
