@@ -34,7 +34,7 @@ class DogList(Resource):
             )
 
         self.reqparse.add_argument(
-            'owner',
+            'Owner',
             required=False,
             help='No dog name provided',
             location=['form', 'json']
@@ -51,24 +51,21 @@ class DogList(Resource):
             help='No dog name provided',
             location=['form','json']
         )
-            self.reqparse.add_argument(
+        self.reqparse.add_argument(
             'breed',
             required=false,
             help='No dog breed provided',
             location=['form','json']
         )
-            self.reqparse.add_argument(
-            'owner',
+        self.reqparse.add_argument(
+            'Owner',
             required=false,
             help='No dog owner provided',
             location=['form','json']
         )
-        def post(self):
-            args = self.reparse.parse_args()
-            print(args,'<----args(req.body)')
-            dogs = models.Dog.create(**args)
-            return jsonify({'dogs': [{'name': 'Franklin'}]})
 
+
+    marshal_with(dog_fields)
     def post(self):
         # read the args "req.body"
         args = self.reqparse.parse_args()
@@ -76,17 +73,45 @@ class DogList(Resource):
         dog = models.Dog.create(**args)
         # line 52 does line 54
         # dog = models.Dog.create(name=args['name'], breed=args['breed'], owner=args['owner'])
-        return jsonify({'dogs': [{'name': 'Franklin'}]})
+        return dog
 
 class Dog(Resource):
-    def get(self, id):
-        return jsonify({'name': 'Franklin'})
+        self.reqparse = reqparse.RequestParser()
 
-    def put(self, id):
-        return jsonify({'name': 'Franklin'})
+        self.reqparse.add_argument(
+            'name',
+            required=False,
+            help='No dog name provided',
+            location=['form', 'json']
+            )
 
-    def delete(self, id):
-        return jsonify({'name': 'Franklin'})
+        self.reqparse.add_argument(
+            'breed',
+            required=False,
+            help='No dog name provided',
+            location=['form', 'json']
+            )
+
+        self.reqparse.add_argument(
+            'Owner',
+            required=False,
+            help='No dog name provided',
+            location=['form', 'json']
+            )
+
+        super().__init__()
+        def get(self, id):
+            return jsonify({'name': 'Franklin'})
+
+        def put(self, id):
+            args = self.reqparse.parse_args()
+            query = models.Dog.update(**args).where(models.Dog.id==id)
+            query.execute()
+            print(query,'<---- this is query')
+            return (models.Dog.get(models.Dog.id==id),200)
+
+        def delete(self, id):
+            return jsonify({'name': 'Franklin'})
 
 
 # were setting a module of view functions that can be attached to our flask app
@@ -99,11 +124,9 @@ api = Api(dogs_api)
 
 api.add_resource(
     DogList,
-    '/dogs',
-    endpoint='dogs'
+    '/dogs'
 )
 api.add_resource(
     Dog,
-    '/dogs/<int:id>',
-    endpoint='dog'
+    '/dogs/<int:id>'
 )
