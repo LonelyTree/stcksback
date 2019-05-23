@@ -51,15 +51,23 @@ class DogList(Resource):
 
     def get(self):
         # models.Dog.select() ## Look up peewee queries
+        # all_dogs = models.Dog.select()
+        # print(all_dogs, "<--- all dogs result of db.query")
+        # new_dogs = []
 
+        # for dog in all_dogs:
+        #     new_dogs.append(marshal(dog, dog_fields))
+
+        new_dogs = [marshal(dog, dog_fields) for dog in models.Dog.select()]
+        # [{}, Model Instances]
         # for Generating response object
         # marshal in flask
-        return jsonify({'dogs': [{'name': 'Franklin'}]})
+        return new_dogs
 
     @marshal_with(dog_fields)
     def post(self):
         # read the args "req.body"
-        args = self.reqparse.parse_args()
+        args = self.reqparse.parse_args() # body-parser
         print(args, '<----- args (req.body)')
         dog = models.Dog.create(**args)
         print(dog, "<---" , type(dog))
