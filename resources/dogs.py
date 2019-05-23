@@ -1,3 +1,6 @@
+
+
+
 from flask import jsonify, Blueprint
 from flask_restful import (Resource, Api, reqparse, fields, marshal,
                                marshal_with, url_for)
@@ -6,11 +9,13 @@ from flask_restful import (Resource, Api, reqparse, fields, marshal,
 import models
 
 ## define what fields we want on our responses
+
+## Marshal Fields
 dog_fields = {
     'id': fields.Integer,
     'name': fields.String,
     'breed': fields.String,
-    'Owner': fields.String
+    'owner': fields.String
 }
 
 # view functions
@@ -65,17 +70,20 @@ class DogList(Resource):
         )
 
 
-    marshal_with(dog_fields)
+    @marshal_with(dog_fields)
     def post(self):
         # read the args "req.body"
         args = self.reqparse.parse_args()
         print(args, '<----- args (req.body)')
         dog = models.Dog.create(**args)
+        print(dog, "<---" , type(dog))
         # line 52 does line 54
         # dog = models.Dog.create(name=args['name'], breed=args['breed'], owner=args['owner'])
-        return dog
+        return (dog, 201)
 
 class Dog(Resource):
+    def __init__(self):
+        # reqparse, its like body-parser in express, (it makes the request object's body readable)
         self.reqparse = reqparse.RequestParser()
 
         self.reqparse.add_argument(
@@ -93,25 +101,38 @@ class Dog(Resource):
             )
 
         self.reqparse.add_argument(
-            'Owner',
+            'owner',
             required=False,
             help='No dog name provided',
             location=['form', 'json']
             )
 
         super().__init__()
-        def get(self, id):
-            return jsonify({'name': 'Franklin'})
 
-        def put(self, id):
-            args = self.reqparse.parse_args()
-            query = models.Dog.update(**args).where(models.Dog.id==id)
-            query.execute()
-            print(query,'<---- this is query')
-            return (models.Dog.get(models.Dog.id==id),200)
+    @marshal_with(dog_fields)
+    def get(self, id):
 
-        def delete(self, id):
-            return jsonify({'name': 'Franklin'})
+        try:
+            dog = models.Dog.get(models.Dog.id==id)
+        except models.Dog.DoesNotExist:
+            abort(404)
+        else:
+            return (dog, 200)
+
+    @marshal_with(dog_fields)
+    def put(self, id):
+        # parse the args (get req.body)
+        args = self.reqparse.parse_args()
+        query = models.Dog.update(**args).where(models.Dog.id==id)
+        # we have execute the query
+        query.execute()
+        print(query, "<--- this is query")
+        # the query doesn't respond with the update object
+        return (models.Dog.get(models.Dog.id==id), 200)
+
+    def delete(self, id):
+
+        return jsonify({'name': 'Franklin'})
 
 
 # were setting a module of view functions that can be attached to our flask app
