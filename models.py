@@ -15,13 +15,13 @@ class Dog(Model):
     created_at = DateTimeField(default=datetime.datetime.now)
 
     class Meta:
-        # instructions on what database to connect too
+        # instructions on what database to connect too, in our current case sqlite
         database = DATABASE
 
 
 
 
 def initialize():
-    DATABASE.connect()
-    DATABASE.create_tables([Dog], safe=True)
+    DATABASE.connect() #opening a connection to the db
+    DATABASE.create_tables([Dog], safe=True)#the array takes our models and will create tables that match them
     DATABASE.close()
