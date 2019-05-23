@@ -1,8 +1,11 @@
 from flask import Flask, g
+
 import models
 
 # because we have __init__.py we can use the folder as module
 from resources.dogs import dogs_api
+
+
 
 DEBUG = True
 PORT = 8000
