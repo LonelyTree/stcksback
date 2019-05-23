@@ -11,6 +11,8 @@ import models
 ## define what fields we want on our responses
 
 ## Marshal Fields
+# dog_fields have to do with what we want the response object
+# to the client to look like
 dog_fields = {
     'id': fields.Integer,
     'name': fields.String,
@@ -49,32 +51,24 @@ class DogList(Resource):
         super().__init__()
 
     def get(self):
-        return jsonify({'dogs': [{'name': 'Franklin'}]})
-        self.reqparse = reqparse.RequestParser()
-        self.reqparse.add_argument(
-            'name',
-            required=false,
-            help='No dog name provided',
-            location=['form','json']
-        )
-        self.reqparse.add_argument(
-            'breed',
-            required=false,
-            help='No dog breed provided',
-            location=['form','json']
-        )
-        self.reqparse.add_argument(
-            'Owner',
-            required=false,
-            help='No dog owner provided',
-            location=['form','json']
-        )
+        # models.Dog.select() ## Look up peewee queries
+        # all_dogs = models.Dog.select()
+        # print(all_dogs, "<--- all dogs result of db.query")
+        # new_dogs = []
 
+        # for dog in all_dogs:
+        #     new_dogs.append(marshal(dog, dog_fields))
+
+        new_dogs = [marshal(dog, dog_fields) for dog in models.Dog.select()]
+        # [{}, Model Instances]
+        # for Generating response object
+        # marshal in flask
+        return new_dogs
 
     @marshal_with(dog_fields)
     def post(self):
         # read the args "req.body"
-        args = self.reqparse.parse_args()
+        args = self.reqparse.parse_args() # body-parser
         print(args, '<----- args (req.body)')
         dog = models.Dog.create(**args)
         print(dog, "<---" , type(dog))
@@ -134,9 +128,7 @@ class Dog(Resource):
     def delete(self, id):
         query = models.Dog.delete().where(models.Dog.id == id)
         query.execute()
-        return{'message':'resource deleted'}
-
-        
+        return {"message": "resource deleted"}
 
 
 # were setting a module of view functions that can be attached to our flask app
