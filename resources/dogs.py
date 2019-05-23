@@ -1,7 +1,7 @@
 
 
 
-from flask import jsonify, Blueprint
+from flask import jsonify, Blueprint, abort
 from flask_restful import (Resource, Api, reqparse, fields, marshal,
                                marshal_with, url_for)
 
@@ -17,6 +17,7 @@ dog_fields = {
     'breed': fields.String,
     'owner': fields.String
 }
+#Dog fields have to do with what we want the response object to the client to look like
 
 # view functions
 class DogList(Resource):
@@ -131,8 +132,11 @@ class Dog(Resource):
         return (models.Dog.get(models.Dog.id==id), 200)
 
     def delete(self, id):
+        query = models.Dog.delete().where(models.Dog.id == id)
+        query.execute()
+        return{'message':'resource deleted'}
 
-        return jsonify({'name': 'Franklin'})
+        
 
 
 # were setting a module of view functions that can be attached to our flask app
