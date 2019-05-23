@@ -30,7 +30,7 @@ def after_request(response):
 
 @app.route('/')
 def index():
-    return 'hi'
+    return jsonify({"data" : "Im data"})
 
 if __name__ == '__main__':
     models.initialize()

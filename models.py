@@ -3,6 +3,8 @@ import datetime
 # peewee is orm
 # this will give our model the power to talk to postgres sql
 # peewee is kinda mongoose
+# orm object relational mapper
+
 from peewee import *
 
 DATABASE = SqliteDatabase('dogs.sqlite')
