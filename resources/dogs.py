@@ -49,7 +49,7 @@ class DogList(Resource):
 
         super().__init__()
 
-
+    @login_required
     def get(self):
 
         # models.Dog.select() ## Look up peewee queries
