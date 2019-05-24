@@ -484,7 +484,11 @@ def initialize():
 
 ```
 
-- This is very similar to what we did on Friday, and we added a relation with the Dog model.  
+-  We are using the UserMixin here from [flask-login](https://flask-login.readthedocs.io/en/latest/), to give our User class some default features.  Mixins are small classes that add some specific feature. Since they're not the final class that we want to extend, they go at the beginning of our inheritance chain.
+
+- `@classmethod` - a class method knows its class, it is used to be availiable for the class and we can use it anytime instead of having to instatiate the class in order to use a method that way we can use User.create_user anywhere where are model is availiable.  `cls` is an object that holds the class itself, not an instance of the class. 
+
+- Meta - When Python creates a class object, special construction instructions can be provided. This is done through the Meta class. In this case, the Model base class includes methods for creating and saving instances of this class to a database. This requires knowing which database to use. Since the database isn't part of the class itself, this class constructor information is provided through the special Meta class.
 
 - Notice we can also create a `config` file to hold our configuration options.  
 
