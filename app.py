@@ -29,8 +29,8 @@ def load_user(userid):
 
 # app.use(dogController, '/api/v1')
 # url prefix start every route with /api/v1 in that blue print
-CORS(dogs_api, origins=['http://localhost:3000'], support_credentials=True)
-CORS(users_api, origins=['http://localhost:3000'], support_credentials=True)
+CORS(dogs_api, origins=["http://localhost:3000"], supports_credentials=True)
+CORS(users_api, origins= ["http://localhost:3000"], supports_credentials=True)
 app.register_blueprint(dogs_api, url_prefix='/api/v1')
 app.register_blueprint(users_api, url_prefix='/users')
 

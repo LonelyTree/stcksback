@@ -22,7 +22,7 @@ class User(UserMixin, Model):
         database = DATABASE
 
     @classmethod
-    def create_user(cls, username, email, password):
+    def create_user(cls, username, email, password, **kwargs):
         # making email lowercase
         # sanitize your data
         email = email.lower()
@@ -39,7 +39,8 @@ class User(UserMixin, Model):
             user.save()
             return user
         else:
-            raise Exception("user with that email already exists")
+            return "user with that email already existis"
+
 
 
 
