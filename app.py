@@ -1,13 +1,15 @@
 from flask import Flask, g
+from flask_login import LoginManager
 import models
 
 # because we have __init__.py we can use the folder as module
 from resources.dogs import dogs_api
+print(dogs_api)
 
-DEBUG = True
-PORT = 8000
+import config
 
 app = Flask(__name__)
+app.secret_key = config.SECRET_KEY
 # app.use(dogController, '/api/v1')
 # url prefix start every route with /api/v1 in that blue print
 app.register_blueprint(dogs_api, url_prefix='/api/v1')
@@ -34,4 +36,4 @@ def index():
 
 if __name__ == '__main__':
     models.initialize()
-    app.run(debug=DEBUG, port=PORT)
+    app.run(debug=config.DEBUG, port=config.PORT)

@@ -122,7 +122,7 @@ class Dog(Resource):
         query.execute()
         print(query, "<--- this is query")
         # the query doesn't respond with the update object
-        return (models.Dog.get(models.Dog.id==id), 200)
+        return (models.Dog.get(models.Dog.id==id), 204)
 
     def delete(self, id):
         query = models.Dog.delete().where(models.Dog.id == id)
