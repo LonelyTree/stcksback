@@ -5,7 +5,7 @@ from flask import jsonify, Blueprint, abort
 from flask_restful import (Resource, Api, reqparse, fields, marshal,
                                marshal_with, url_for)
 
-
+from flask_login import login_required, current_user
 import models
 
 ## define what fields we want on our responses
@@ -50,7 +50,9 @@ class DogList(Resource):
 
         super().__init__()
 
+
     def get(self):
+
         # models.Dog.select() ## Look up peewee queries
         # all_dogs = models.Dog.select()
         # print(all_dogs, "<--- all dogs result of db.query")
