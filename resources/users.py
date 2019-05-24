@@ -46,6 +46,7 @@ class UserList(Resource):
     def post(self):
         #registrations
         args = self.reqparse.parse_args()
+        print(args)
         if args['password'] == args['verify_password']:
             print(args, ' this is args')
             user = models.User.create_user(**args)
