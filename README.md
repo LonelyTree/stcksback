@@ -6,7 +6,7 @@ We are going to create a basic api that performs all crud routes, as well as hav
 
 #### Setup virtualenv
 
-- inside flask-api-dogs folder
+- inside flask-api-chopsticks folder
 ```bash
 virtualenv .env -p python3
 source .env/bin/activate
@@ -47,10 +47,10 @@ import datetime
 
 from peewee import *
 
-DATABASE = SqliteDatabase('dogs.sqlite')
+DATABASE = SqliteDatabase('chopsticks.sqlite')
 
 
-class Dog(Model):
+class chopstick(Model):
     name = CharField()
     owner = CharField()
     breed = CharField()
@@ -64,7 +64,7 @@ class Dog(Model):
 
 def initialize():
     DATABASE.connect()
-    DATABASE.create_tables([Dog], safe=True)
+    DATABASE.create_tables([chopstick], safe=True)
     DATABASE.close()
 
 ```
@@ -137,7 +137,7 @@ def after_request(response):
 ```bash
 mkdir resources
 touch resources/init.py
-touch resources/dogs.py
+touch resources/chopsticks.py
 ```
 
 ```python
@@ -148,12 +148,12 @@ from flask_restful import Resource, Api
 import models
 
 
-class DogList(Resource):
+class chopstickList(Resource):
     def get(self):
-        return jsonify({'dogs': [{'name': 'Franklin'}]})
+        return jsonify({'chopsticks': [{'name': 'Franklin'}]})
 
 
-class Dog(Resource):
+class chopstick(Resource):
     def get(self, id):
         return jsonify({'name': 'Franklin'})
 
@@ -163,17 +163,17 @@ class Dog(Resource):
     def delete(self, id):
         return jsonify({'name': 'Franklin'})
 
-dogs_api = Blueprint('resources.dogs', __name__)
-api = Api(dogs_api)
+chopsticks_api = Blueprint('resources.chopsticks', __name__)
+api = Api(chopsticks_api)
 api.add_resource(
-    DogList,
-    '/dogs',
-    endpoint='dogs'
+    chopstickList,
+    '/chopsticks',
+    endpoint='chopsticks'
 )
 api.add_resource(
-    Dog,
-    '/dogs/<int:id>',
-    endpoint='dog'
+    chopstick,
+    '/chopsticks/<int:id>',
+    endpoint='chopstick'
 )
 ```
 
@@ -183,9 +183,9 @@ api.add_resource(
 
 -  *BluePrints* - The basic concept of blueprints is that they record operations to execute when registered on an application. Flask associates view functions with blueprints when dispatching requests and generating URLs from one endpoint to another.
 
-- `dogs_api = Blueprint('resources.dogs', __name__)` says treat this as a blueprint in the application (module) that we can attach to our flask app the will define a set of view functions.  
+- `chopsticks_api = Blueprint('resources.chopsticks', __name__)` says treat this as a blueprint in the application (module) that we can attach to our flask app the will define a set of view functions.  
 
-- `api = Api(dogs_api)` - This is instating our api from our blueprint (or an app), that gives us special methods we can work with to operate our api.  Docs can be found [here](https://flask-restful.readthedocs.io/en/latest/api.html#id1)
+- `api = Api(chopsticks_api)` - This is instating our api from our blueprint (or an app), that gives us special methods we can work with to operate our api.  Docs can be found [here](https://flask-restful.readthedocs.io/en/latest/api.html#id1)
 
 - In the `add_resource` - the first argument is the class to construct the end points, and the second argument is the endpoint for the url.
 
@@ -195,7 +195,7 @@ api.add_resource(
 from flask import Flask
 
 import models
-from resources.dogs import dogs_api
+from resources.chopsticks import chopsticks_api
 
 
 DEBUG = True
@@ -203,13 +203,13 @@ HOST = '0.0.0.0'
 PORT = 8000
 
 app = Flask(__name__)
-app.register_blueprint(dogs_api, url_prefix='/api/v1')
+app.register_blueprint(chopsticks_api, url_prefix='/api/v1')
 
 ## rest of file
 
 ```
 
-- the `url_prefix='/api/v1'` is prefix all of our routes (`/dogs`, `/dogs/<int:id>`) with `/api/v1`
+- the `url_prefix='/api/v1'` is prefix all of our routes (`/chopsticks`, `/chopsticks/<int:id>`) with `/api/v1`
 
 
 ### Reqparse 
@@ -229,26 +229,26 @@ from flask_restful import (Resource, Api, reqparse, fields, marshal,
 import models
 
 ## define fields on responses
-dog_fields = {
+chopstick_fields = {
     'id': fields.Integer,
     'name': fields.String,
     'breed': fields.String,
 }
 
 
-class DogList(Resource):
+class chopstickList(Resource):
     def __init__(self):
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument(
             'name',
             required=False,
-            help='No dog name provided',
+            help='No chopstick name provided',
             location=['form', 'json']
         )
         self.reqparse.add_argument(
             'breed',
             required=False,
-            help='No course dog breed provided',
+            help='No course chopstick breed provided',
             location=['form', 'json']
         )
         self.reqparse.add_argument(
@@ -260,16 +260,16 @@ class DogList(Resource):
         super().__init__()
         
     def get(self):
-        return jsonify({'dogs': [{'name': 'Franklin'}]})
+        return jsonify({'chopsticks': [{'name': 'Franklin'}]})
 
     def post(self):
         args = self.reqparse.parse_args()
         print(args, 'hittingggg ')
-        dog = models.Dog.create(**args)
-        return jsonify({'dogs': [{'name': 'Franklin'}]})
+        chopstick = models.chopstick.create(**args)
+        return jsonify({'chopsticks': [{'name': 'Franklin'}]})
 
 
-class Dog(Resource):
+class chopstick(Resource):
     def get(self, id):
         return jsonify({'name': 'Franklin'})
 
@@ -279,17 +279,17 @@ class Dog(Resource):
     def delete(self, id):
         return jsonify({'name': 'Franklin'})
 
-dogs_api = Blueprint('resources.dogs', __name__)
-api = Api(dogs_api)
+chopsticks_api = Blueprint('resources.chopsticks', __name__)
+api = Api(chopsticks_api)
 api.add_resource(
-    DogList,
-    '/dogs',
-    endpoint='dogs'
+    chopstickList,
+    '/chopsticks',
+    endpoint='chopsticks'
 )
 api.add_resource(
-    Dog,
-    '/dogs/<int:id>',
-    endpoint='dog'
+    chopstick,
+    '/chopsticks/<int:id>',
+    endpoint='chopstick'
 )
 ```
 
@@ -299,8 +299,8 @@ api.add_resource(
 def post(self):
         args = self.reqparse.parse_args()
         print(args, 'hittingggg ')
-        dog = models.Dog.create(**args)
-        return jsonify({'dogs': [{'name': 'Franklin'}]})
+        chopstick = models.chopstick.create(**args)
+        return jsonify({'chopsticks': [{'name': 'Franklin'}]})
   ``` 
 - We can access the args by calling `.parse_args` on every request, think about `body_parser` in express.  Then we are spreading out all the arguments to the properties we want to pass to the create.  An example would look like the following, 
  The location tells us where we will accept requests from in this case `x-form-www-urlencoded` and `json`, (so basically forms and ajax requests)
@@ -329,47 +329,47 @@ z=3
 - So our db responses we won't be able to serialize them into json, so we have to use this thing called [marshal](marshal(data, fields, envelope=None)¶
 Takes raw data (https://flask-restful.readthedocs.io/en/latest/api.html)
 
-- marshal -Takes raw data (in the form of a dict, list, object) and a dict of fields to output and filters the data based on the fields we defined in the `dog_fields` dictionary
+- marshal -Takes raw data (in the form of a dict, list, object) and a dict of fields to output and filters the data based on the fields we defined in the `chopstick_fields` dictionary
 
 - This will be done to each field from our response from our database like the following
 
 ```python
 def get(self):
-        dogs = [marshal(dog, dog_fields)
-                   for dog in models.Dog.select()]
-        return {'dogs': dogs}
+        chopsticks = [marshal(chopstick, chopstick_fields)
+                   for chopstick in models.chopstick.select()]
+        return {'chopsticks': chopsticks}
 
 ```
 
 - We can also use the `marshal_with` like the following, which is just a decorator the does what we just did but for us. 
 
 ```python
-@marshal_with(dog_fields)
+@marshal_with(chopstick_fields)
 def get(self, id):
-    return dog_or_404(id)
+    return chopstick_or_404(id)
 
 ```
 
 - **Go ahead and use it with the Post**
 
 ```python
-@marshal_with(dog_fields)
+@marshal_with(chopstick_fields)
     def post(self):
         args = self.reqparse.parse_args()
-        dog = models.Dog.create(**args)
-        return dog
+        chopstick = models.chopstick.create(**args)
+        return chopstick
 ```
 
-- and we can define a function to either send the 404 using `abort` or return the dog, and the result of that is turned in json using the `@marshal_with` decorator.  
+- and we can define a function to either send the 404 using `abort` or return the chopstick, and the result of that is turned in json using the `@marshal_with` decorator.  
 
 ```python
-def dog_or_404(dog_id):
+def chopstick_or_404(chopstick_id):
     try:
-        dog = models.Dog.get(models.Dog.id==dog_id)
-    except models.Dog.DoesNotExist:
+        chopstick = models.chopstick.get(models.chopstick.id==chopstick_id)
+    except models.chopstick.DoesNotExist:
         abort(404)
     else:
-        return dog
+        return chopstick
 ```
 
 ### Put and Delete Route
@@ -377,19 +377,19 @@ def dog_or_404(dog_id):
 - We have to update our class to specify what fields we want to allow on our requests to the server
 
 ```python
-class Dog(Resource):
+class chopstick(Resource):
     def __init__(self):
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument(
             'name',
             required=False,
-            help='No dog name provided',
+            help='No chopstick name provided',
             location=['form', 'json']
         )
         self.reqparse.add_argument(
             'breed',
             required=False,
-            help='No course dog breed provided',
+            help='No course chopstick breed provided',
             location=['form', 'json']
         )
         self.reqparse.add_argument(
@@ -400,26 +400,26 @@ class Dog(Resource):
         )
         super().__init__()
 
-    @marshal_with(dog_fields)
+    @marshal_with(chopstick_fields)
     def get(self, id):
-        return dog_or_404(id)
+        return chopstick_or_404(id)
 
-    @marshal_with(dog_fields)
+    @marshal_with(chopstick_fields)
     def put(self, id):
         args = self.reqparse.parse_args()
-        query = models.Dog.update(**args).where(models.Dog.id==id)
+        query = models.chopstick.update(**args).where(models.chopstick.id==id)
         query.execute()
-        return (models.Dog.get(models.Dog.id==id), 200)
+        return (models.chopstick.get(models.chopstick.id==id), 200)
 
 ```
 
-- Here we see the put route for the model we need to define the query then execute it to perform the update, (usually it does it automatically.  Then we are just fetching the Dog and returning a tuple with a status code if we want.  You don't have to return a tuple (like we did before), but we are showing you we can and you can include the status code.  
+- Here we see the put route for the model we need to define the query then execute it to perform the update, (usually it does it automatically.  Then we are just fetching the chopstick and returning a tuple with a status code if we want.  You don't have to return a tuple (like we did before), but we are showing you we can and you can include the status code.  
 
 **Go ahead and give delete a try**
 
 ```python
 def delete(self, id):
-    query = models.Dog.delete().where(models.Dog.id==id)
+    query = models.chopstick.delete().where(models.chopstick.id==id)
     query.execute()
     return 'resource deleted'
 ```
@@ -440,7 +440,7 @@ from flask_login import UserMixin
 
 import config
 
-DATABASE = SqliteDatabase('dogs.sqlite')
+DATABASE = SqliteDatabase('chopsticks.sqlite')
 
 class User(UserMixin, Model):
     username = CharField(unique=True)
@@ -466,11 +466,11 @@ class User(UserMixin, Model):
         else:
             raise Exception("User with that email already exists")
 
-class Dog(Model):
+class chopstick(Model):
     name = CharField()
     owner = CharField()
     breed = CharField()
-    created_by = ForeignKeyField(User, related_name='dog_set')
+    created_by = ForeignKeyField(User, related_name='chopstick_set')
     created_at = DateTimeField(default=datetime.datetime.now)
 
     class Meta:
@@ -479,7 +479,7 @@ class Dog(Model):
 
 def initialize():
     DATABASE.connect()
-    DATABASE.create_tables([User, Dog], safe=True)
+    DATABASE.create_tables([User, chopstick], safe=True)
     DATABASE.close()
 
 ```
@@ -505,7 +505,7 @@ from flask import Flask
 
 import models
 from resources.users import users_api
-from resources.dogs import dogs_api
+from resources.chopsticks import chopsticks_api
 from flask_cors import CORS
 from flask_login import LoginManager
 login_manager = LoginManager()
@@ -525,9 +525,9 @@ def load_user(userid):
     except models.DoesNotExist:
         return None
 
-CORS(dogs_api, origins=["http://localhost:3000"], supports_credentials=True)
+CORS(chopsticks_api, origins=["http://localhost:3000"], supports_credentials=True)
 CORS(users_api, origins= ["http://localhost:3000"], supports_credentials=True)
-app.register_blueprint(dogs_api, url_prefix='/api/v1')
+app.register_blueprint(chopsticks_api, url_prefix='/api/v1')
 app.register_blueprint(users_api, url_prefix='/api/v1')
 
 @app.route('/')
@@ -628,9 +628,9 @@ api.add_resource(
 @login_required
 def get(self):
 
-    dogs = [marshal(dog, dog_fields)
-               for dog in models.Dog.select()]
-    return {'dogs': dogs}
+    chopsticks = [marshal(chopstick, chopstick_fields)
+               for chopstick in models.chopstick.select()]
+    return {'chopsticks': chopsticks}
 
 ```
 
@@ -643,7 +643,7 @@ Cool and we've set up our api to work with react!
 $ psql
 > CREATE DATABASE database_name;
 > CREATE USER jimuser WITH PASSWORD 'password';
-GRANT ALL PRIVILEGES ON DATABASE dog TO jimuser;
+GRANT ALL PRIVILEGES ON DATABASE chopstick TO jimuser;
 > \q
 ```
 
@@ -654,7 +654,7 @@ GRANT ALL PRIVILEGES ON DATABASE dog TO jimuser;
 models.py
 ```python
 DATABASE = PostgresqlDatabase(
-    'dog',  # Required by Peewee.
+    'chopstick',  # Required by Peewee.
     user='jim',  # Will be passed directly to psycopg2.
     password='password'
     )  
