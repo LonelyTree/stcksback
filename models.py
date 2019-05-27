@@ -11,7 +11,7 @@ from flask_login import UserMixin
 
 
 
-DATABASE = PostgresqlDatabase('dogs', user="jimuser", password='password')
+DATABASE = PostgresqlDatabase('dogs', user="reeduser", password='password')
 
 class User(UserMixin, Model):
     username = CharField(unique=True)
