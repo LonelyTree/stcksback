@@ -18,7 +18,8 @@ chopstick_fields = {
     'width': fields.String,
     'color': fields.String,
     'message': fields.String,
-    'owner': fields.String
+    'owner': fields.String,
+    'id': fields.Integer
 }
 #chopstick fields have to do with what we want the response object to the client to look like
 
@@ -129,13 +130,13 @@ class chopstick(Resource):
     @marshal_with(chopstick_fields)
     def put(self, id):
         args = self.reqparse.parse_args()
-        query = models.chopstick.update(**args).where(models.chopstick.id==id)
+        query = models.chopsticks.update(**args).where(models.chopsticks.id==id)
         query.execute()
         print(query, "<--- this is query")
-        return (models.chopstick.get(models.chopstick.id==id), 204)
+        return (models.chopsticks.get(models.chopsticks.id==id), 204)
 
     def delete(self, id):
-        query = models.chopstick.delete().where(models.chopstick.id == id)
+        query = models.chopsticks.delete().where(models.chopsticks.id == id)
         query.execute()
         return {"message": "resource deleted"}
 
@@ -146,7 +147,8 @@ api = Api(chopsticks_api)
 
 api.add_resource(
     chopstickList,
-    '/chopsticks/list/<string:owner>'
+    '/chopsticks/list/<string:owner>',
+    '/chopsticks'
 )
 api.add_resource(
     chopstick,
