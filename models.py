@@ -43,6 +43,7 @@ class chopsticks(Model):
     width = CharField()
     color = CharField()
     message = CharField()
+    owner = CharField()
     created_at = DateTimeField(default=datetime.datetime.now)
 
     class Meta:

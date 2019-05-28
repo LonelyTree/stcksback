@@ -54,6 +54,12 @@ class chopstickList(Resource):
             help='No chopstick name provided',
             location=['form', 'json']
             )
+        self.reqparse.add_argument(
+            'owner',
+            required=False,
+            help='No chopstick name provided',
+            location=['form', 'json']
+            )
 
         super().__init__()
 
@@ -97,6 +103,12 @@ class chopstick(Resource):
             )
         self.reqparse.add_argument(
             'message',
+            required=False,
+            help='No chopstick name provided',
+            location=['form', 'json']
+            )
+        self.reqparse.add_argument(
+            'owner',
             required=False,
             help='No chopstick name provided',
             location=['form', 'json']
