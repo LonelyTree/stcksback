@@ -7,8 +7,8 @@ from flask_login import UserMixin
 DATABASE = PostgresqlDatabase('chopsticks', user="reeduser", password='password')
 
 class User(UserMixin, Model):
-    username = CharField(unique=True)
-    email    = CharField(unique=True)
+    username = CharField()
+    email    = CharField()
     password = CharField()
 
     class Meta:

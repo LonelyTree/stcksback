@@ -64,10 +64,10 @@ class chopstickList(Resource):
         super().__init__()
 
     @login_required
-    def get(self):
+    def get(self, owner):
 
 
-        new_chopsticks = [marshal(chopstick, chopstick_fields) for chopstick in models.chopsticks.select()]
+        new_chopsticks = [marshal(chopstick, chopstick_fields) for chopstick in models.chopsticks.select().where(models.chopsticks.owner==owner)]
         return new_chopsticks
 
     @marshal_with(chopstick_fields)
@@ -146,7 +146,7 @@ api = Api(chopsticks_api)
 
 api.add_resource(
     chopstickList,
-    '/chopsticks'
+    '/chopsticks/list/<string:owner>'
 )
 api.add_resource(
     chopstick,
